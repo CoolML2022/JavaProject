@@ -77,7 +77,7 @@ public class MainFrame extends JFrame {
         buttonsPanel.add(jbutOK);
         buttonsPanel.add(jbutCLEAR);
 
-
+        //Test
 
 
         JPanel mainPanel = new JPanel();
