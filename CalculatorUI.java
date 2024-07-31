@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,13 +37,10 @@ public class CalculatorUI extends JFrame{
             String value = String.valueOf(i);
             numberButtons[i] = new JButton(String.valueOf(i));
             numberButtons[i].setFont(maiFont);
-            numberButtons[i].addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {   
-                    mainString = inputTextField.getText();
-                    mainString = mainString + value;                   
-                    inputTextField.setText(mainString);                    
-                }
+            numberButtons[i].addActionListener((ActionEvent e) -> {
+                mainString = inputTextField.getText();
+                mainString = mainString + value;
+                inputTextField.setText(mainString);
             });
         }
         JButton[] operatorButtons = new JButton[Operators.length];
@@ -52,41 +48,31 @@ public class CalculatorUI extends JFrame{
             String operator = Operators[i];
             operatorButtons[i] = new JButton(Operators[i]);
             operatorButtons[i].setFont(maiFont);
-            operatorButtons[i].addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    char[] inputField = inputTextField.getText().toCharArray();
-                    if(!Arrays.asList(Operators).contains(inputField[inputField.length-1])){
-                        mainString = inputTextField.getText();
-                        mainString += operator;
-                        inputTextField.setText(mainString);                        
-                    }
+            operatorButtons[i].addActionListener((ActionEvent e) -> {
+                char[] inputField = inputTextField.getText().toCharArray();
+                if(!Arrays.asList(Operators).contains(inputField[inputField.length-1])){
+                    mainString = inputTextField.getText();
+                    mainString += operator;
+                    inputTextField.setText(mainString);
                 }            
             });
         }
         /* *******************Equals Button******************* */
         JButton equalsButton = new JButton("=");
         equalsButton.setFont(maiFont);
-        equalsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mainString = inputTextField.getText();
-                outputTextField.setText(Interpreter(mainString));                
-            }            
+        equalsButton.addActionListener((ActionEvent e) -> {
+            mainString = inputTextField.getText();
+            outputTextField.setText(Interpreter(mainString));            
         });
         /* ******************Clear Button********************* */
         JButton clearButton = new JButton("AC");
         clearButton.setFont(maiFont);
-        clearButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {                
-                mainString = "";
-                inputTextField.setText(mainString);
-                outputTextField.setText(" ");
-            }            
+        clearButton.addActionListener((ActionEvent e) -> {
+            mainString = "";
+            inputTextField.setText(mainString);
+            outputTextField.setText(" ");            
         });
-        /*                                                     */
+        /* ************ Button Panel Initialize ************* */
         JPanel buttonsJPanel = new JPanel();
         buttonsJPanel.setLayout(new GridLayout(4, 3, 5 ,5));
         for (JButton numberButton : numberButtons) {
@@ -113,8 +99,8 @@ public class CalculatorUI extends JFrame{
     List<String> operators;
     List<Float> numbers;
     public String Interpreter (String mainString){
-        operators = new ArrayList<String>();
-        numbers = new ArrayList<Float>();   
+        operators = new ArrayList<>();
+        numbers = new ArrayList<>();   
         mainString += "+"; //initiate placeholder removed later ---->
         char[] testCharaters = mainString.toCharArray();
         String cont = "";
