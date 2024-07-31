@@ -72,7 +72,8 @@ public class CalculatorUI extends JFrame{
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if(operatorEntered){
+                    char[] inputField = inputTextField.getText().toCharArray();
+                    if(String.valueOf(inputField[inputField.length -1]).equals(Operators)){
                         mainString = inputTextField.getText();
                         mainString += operator;
                         inputTextField.setText(mainString);
