@@ -41,8 +41,7 @@ public class CalculatorUI extends JFrame{
         for(int i = 0; i < numberButtons.length; i++){
             String value = String.valueOf(i);
             numberButtons[i] = new JButton(String.valueOf(i));
-            numberButtons[i].setFont(mainFont);
-            numberButtons[i].setBackground(new Color(255, 255, 255));
+            numberButtons[i].setFont(mainFont);    
             numberButtons[i].addActionListener((ActionEvent e) -> {
                 mainString = inputTextField.getText();
                 mainString = mainString + value;
@@ -76,19 +75,19 @@ public class CalculatorUI extends JFrame{
                     inputTextField.setText(mainString);
                 }            
             });
+
         }
         /* *******************Equals Button******************* */
         JButton equalsButton = new JButton("=");
         equalsButton.setFont(mainFont);
-        
-        equalsButton.setBackground(new Color(0, 0, 0));
+        equalsButton.setBackground(new java.awt.Color(255, 0 ,0));
+        //equalsButton.setBackground(new Color(107, 155, 192, 75));
         equalsButton.addActionListener((ActionEvent e) -> {
             mainString = inputTextField.getText();
             mainString = mainString.replaceAll("\\s+","");
             inputTextField.setText(mainString);
             ScientificCalc calc = new ScientificCalc();
-            calc.InputString = mainString;
-            outputTextField.setText(String.valueOf(calc.ScientificCalc()));            
+            outputTextField.setText(String.valueOf(calc.Findsolution(mainString)));            
         });
         equalsButton.setOpaque(true);
         /* ******************Clear Button********************* */
@@ -102,6 +101,7 @@ public class CalculatorUI extends JFrame{
         /* ************ Button Panel Initialize ************* */
         JPanel buttonsJPanel = new JPanel();
         buttonsJPanel.setLayout(new GridLayout(6, 3, 5 ,5));
+        buttonsJPanel.setBackground(new Color(107, 155, 192, 75));
         for (JButton numberButton : numberButtons) {
             buttonsJPanel.add(numberButton);
         }                
