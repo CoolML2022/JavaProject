@@ -6,12 +6,14 @@ import java.util.regex.Pattern;
 
 public class ScientificCalc {
     final static private String[] Operators = new String[]{"+", "-", "*", "/", "^", "!"};
-    public Double Findsolution(String inputString){
+    public String Findsolution(String inputString){
         String[] bracketStrings;
         Double[] bracketvalues;
         bracketStrings = SeperateBrackets(inputString);
-        bracketvalues = new Double[bracketStrings.length];    
-        return SolveEquation(bracketStrings, bracketvalues);
+        bracketvalues = new Double[bracketStrings.length];
+        String output = "";
+        output = SolveEquation(bracketStrings, bracketvalues);
+        return output;
     }
     /*
      * General principal:
@@ -24,6 +26,7 @@ public class ScientificCalc {
         String[] Strings_to_resolve;
         //Adding a 1 after the factorial to have a consisten structure of the array to identify the operators and the corresponding numbers
         inputString = inputString.replace("!", "!1");
+        inputString = inputString.replace("--", "+");
         //if there are no brackets skip the bracket-solver
         if(!inputString.contains("(")&&!inputString.contains(")")){
             Strings_to_resolve = new String[1];
@@ -106,8 +109,10 @@ public class ScientificCalc {
         return Strings_to_resolve;
     }
 
-    private Double SolveEquation(String[] bracketString, Double[] bracketvalues){
+    private String SolveEquation(String[] bracketString, Double[] bracketvalues){
         //preparing the string for calculating by removing all brackets and adding the value of the pointer (bracketvalues), which was calculated prior
+        String outputString = "";
+        boolean threwError = false; 
         for(int y = 0; y < bracketString.length; y++){
             String equation = bracketString[y];
             Print(equation);
@@ -116,7 +121,8 @@ public class ScientificCalc {
             List<Double> numbers = new ArrayList<>();
             List<String> operators = new ArrayList<>();
             char[] equationChar = equation.toCharArray();
-            String value = "";            
+            String value = "";        
+               
             for(int i = 0; i<equationChar.length; i++){
                 if(Arrays.asList(Operators).contains(String.valueOf(equationChar[i]))){
                     numbers.add(Double.valueOf(value));
@@ -132,9 +138,18 @@ public class ScientificCalc {
                     value+=String.valueOf(equationChar[i]);
             }
             numbers.add(Double.valueOf(value));
-            bracketvalues[y] = Calculate(numbers, operators);
+            try {
+                bracketvalues[y] = Calculate(numbers, operators);
+            } catch (Exception e) {
+                outputString = "Error";
+                threwError = true;
+            }
+            
         }
-        return bracketvalues[bracketvalues.length-1];
+        if(!threwError)
+            outputString = String.valueOf(bracketvalues[bracketvalues.length -1]);
+        //return bracketvalues[bracketvalues.length-1];
+        return outputString;
     }
     /*
      * Calculates the single bracketvalues starting from the most nested one
