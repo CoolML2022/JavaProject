@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -54,7 +53,12 @@ public class CalculatorUI extends JFrame{
                         mainString = mainString.replaceAll("\\s+","");
                         inputTextField.setText(mainString);
                         ScientificCalc calc = new ScientificCalc();
-                        outputTextField.setText(String.valueOf(calc.Findsolution(mainString)));
+                        try {
+                            outputTextField.setText(calc.Findsolution(mainString));
+                        } catch (Exception ee) {
+                            outputTextField.setText("Error");
+                        }
+                        
                     }
                     case "AC" -> { //clear button
                         mainString = null;
@@ -88,14 +92,14 @@ public class CalculatorUI extends JFrame{
                     
                     inputTextField.setText(mainString);
                 }          
-                else if(!Arrays.asList(Operators).contains(String.valueOf(inputField[inputField.length-1]))){
-                    mainString = inputTextField.getText();
-                    mainString += operator;
-                    if("√".equals(operator)){
-                        mainString+= "(";
-                    }
-                    inputTextField.setText(mainString);
-                }            
+                
+                mainString = inputTextField.getText();
+                mainString += operator;
+                if("√".equals(operator)){
+                    mainString+= "(";
+                }
+                inputTextField.setText(mainString);
+                           
             });
 
         }     
