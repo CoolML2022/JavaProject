@@ -15,7 +15,11 @@ import javax.swing.JTextField;
 public class CalculatorUI extends JFrame{
 
     final private Font mainFont = new Font("Arial", Font.BOLD, 18);
-    final private String[] Operators = new String[]{"(", ")", ".", "+", "-", "*", "/", "^","√", "!"};
+    final private String[] Operators = new String[]{".","+", "-", "*", "/", "(", ")", "^","√", "!"};
+    final private String[] Numbers = new String[]{"7", "8", "9",
+                                                  "4", "5", "6", 
+                                                  "1", "2", "3",
+                                                  "0", "=", "AC"};
     JTextField inputTextField, outputTextField;    
     private String mainString;    
     public void Initialize(){
@@ -37,15 +41,33 @@ public class CalculatorUI extends JFrame{
         /*
          * Number Buttons
          */
-        JButton[] numberButtons = new JButton[10];
+        JButton[] numberButtons = new JButton[Numbers.length];
         for(int i = 0; i < numberButtons.length; i++){
-            String value = String.valueOf(i);
-            numberButtons[i] = new JButton(String.valueOf(i));
+            String value = Numbers[i];            
+            numberButtons[i] = new JButton(Numbers[i]);
             numberButtons[i].setFont(mainFont);    
+            int index = i;
             numberButtons[i].addActionListener((ActionEvent e) -> {
-                mainString = inputTextField.getText();
-                mainString = mainString + value;
-                inputTextField.setText(mainString);
+                /* *******************Equals Button******************* */
+                if(Numbers[index].equals("=")){
+                    mainString = inputTextField.getText();
+                    mainString = mainString.replaceAll("\\s+","");
+                    inputTextField.setText(mainString);
+                    ScientificCalc calc = new ScientificCalc();
+                    outputTextField.setText(String.valueOf(calc.Findsolution(mainString))); 
+                }
+                /* ******************Clear Button********************* */
+                else if(Numbers[index].equals("AC")){
+                    mainString = null;
+                    inputTextField.setText(mainString);
+                    outputTextField.setText("");   
+                }
+                else{
+                    mainString = inputTextField.getText();
+                    mainString = mainString + value;
+                    inputTextField.setText(mainString);
+                }
+
             });
         }
         /* ************** Operator Buttons ************** */
@@ -76,46 +98,33 @@ public class CalculatorUI extends JFrame{
                 }            
             });
 
-        }
-        /* *******************Equals Button******************* */
-        JButton equalsButton = new JButton("=");
-        equalsButton.setFont(mainFont);
-        equalsButton.setBackground(new java.awt.Color(255, 0 ,0));
-        //equalsButton.setBackground(new Color(107, 155, 192, 75));
-        equalsButton.addActionListener((ActionEvent e) -> {
-            mainString = inputTextField.getText();
-            mainString = mainString.replaceAll("\\s+","");
-            inputTextField.setText(mainString);
-            ScientificCalc calc = new ScientificCalc();
-            outputTextField.setText(String.valueOf(calc.Findsolution(mainString)));            
-        });
-        equalsButton.setOpaque(true);
-        /* ******************Clear Button********************* */
-        JButton clearButton = new JButton("AC");
-        clearButton.setFont(mainFont);
-        clearButton.addActionListener((ActionEvent e) -> {
-            mainString = null;
-            inputTextField.setText(mainString);
-            outputTextField.setText(" ");            
-        });
+        }     
+        
         /* ************ Button Panel Initialize ************* */
-        JPanel buttonsJPanel = new JPanel();
-        buttonsJPanel.setLayout(new GridLayout(6, 3, 5 ,5));
-        buttonsJPanel.setBackground(new Color(107, 155, 192, 75));
+        JPanel operatorButtonsJPanel = new JPanel();
+        JPanel numberButtonsJPanel = new JPanel();
+        numberButtonsJPanel.setLayout(new GridLayout(4, 3, 5, 5));
+        operatorButtonsJPanel.setLayout(new GridLayout(2, 3, 5 ,5));
+        //operatorButtonsJPanel.setBackground(new Color(107, 155, 192, 75));
         for (JButton numberButton : numberButtons) {
-            buttonsJPanel.add(numberButton);
-        }                
+            numberButton.setOpaque(true);
+            //numberButton.setBackground(Color.BLACK);
+            //numberButton.setForeground(Color.RED);
+            numberButtonsJPanel.add(numberButton);
+        }          
         for (JButton operatorButton : operatorButtons) {
-            buttonsJPanel.add(operatorButton);
+            operatorButtonsJPanel.add(operatorButton);
         }
-        buttonsJPanel.add(equalsButton);
-        buttonsJPanel.add(clearButton);
+        JPanel ButtonsPanel = new JPanel();
+        ButtonsPanel.setLayout(new GridLayout(2, 1, 5 ,5));
+        ButtonsPanel.add(numberButtonsJPanel);
+        ButtonsPanel.add(operatorButtonsJPanel);
         /* ***************** Main Panel Initialize *************** */
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(new Color(91, 173, 235, 92));
         mainPanel.add(screenPanel, BorderLayout.NORTH);
-        mainPanel.add(buttonsJPanel, BorderLayout.CENTER);        
+        mainPanel.add(ButtonsPanel, BorderLayout.CENTER);       
         add(mainPanel);
         setTitle("Calculator");
         setSize(500, 600);
