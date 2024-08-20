@@ -11,8 +11,11 @@ public class ScientificCalc {
         Double[] bracketvalues;
         bracketStrings = SeperateBrackets(inputString);
         bracketvalues = new Double[bracketStrings.length];
-        String output = "";
-        output = SolveEquation(bracketStrings, bracketvalues);
+        String output;
+        if(bracketStrings[0] == null)
+            output = "Missmatching brackets";        
+        else
+            output = SolveEquation(bracketStrings, bracketvalues);
         return output;
     }
     /*
@@ -24,16 +27,22 @@ public class ScientificCalc {
      */
     public String[] SeperateBrackets(String inputString){
         String[] Strings_to_resolve;
+        
+        char[] inputChar = inputString.toCharArray(); 
+        //replaces × with *
+        inputString = inputString.replace("×", "*");
+        //replaces ÷ with /
+        inputString = inputString.replace("÷", "/");
         //Adding a 1 after the factorial to have a consisten structure of the array to identify the operators and the corresponding numbers
         inputString = inputString.replace("!", "!1");
-        inputString = inputString.replace("--", "+");
+        //Double negative is equal to plus: 5--3 == 5+3
+        inputString = inputString.replace("--", "+");        
         //if there are no brackets skip the bracket-solver
         if(!inputString.contains("(")&&!inputString.contains(")")){
             Strings_to_resolve = new String[1];
             Strings_to_resolve[0] = inputString;
             return Strings_to_resolve;
-        }                
-        char[] inputChar = inputString.toCharArray();        
+        }                               
         //checking for any obvoious mistakes by counting the open and closed brackets -> Also used to define the depth of the brackets
         int numOfBracketsOpen = 0;
         int numOfBracketsClose = 0;
@@ -45,7 +54,7 @@ public class ScientificCalc {
                 numOfBracketsClose++;    
         }
         Strings_to_resolve = new String[numOfBracketsClose+1];
-        //To do: adding a correct error message
+        //Extra error Message to identify missing brackets return Strings_to_resolve = null to identify this error
         if(numOfBracketsClose != numOfBracketsOpen){
             return Strings_to_resolve;
         }
@@ -111,8 +120,7 @@ public class ScientificCalc {
 
     private String SolveEquation(String[] bracketString, Double[] bracketvalues){
         //preparing the string for calculating by removing all brackets and adding the value of the pointer (bracketvalues), which was calculated prior
-        String outputString = "";
-        boolean threwError = false; 
+        String outputString;
         for(int y = 0; y < bracketString.length; y++){
             String equation = bracketString[y];
             Print(equation);
@@ -138,16 +146,10 @@ public class ScientificCalc {
                     value+=String.valueOf(equationChar[i]);
             }
             numbers.add(Double.valueOf(value));
-            try {
-                bracketvalues[y] = Calculate(numbers, operators);
-            } catch (Exception e) {
-                outputString = "Error";
-                threwError = true;
-            }
-            
+            bracketvalues[y] = Calculate(numbers, operators);
         }
-        if(!threwError)
-            outputString = String.valueOf(bracketvalues[bracketvalues.length -1]);
+        
+        outputString = String.valueOf(bracketvalues[bracketvalues.length -1]);
         //return bracketvalues[bracketvalues.length-1];
         return outputString;
     }

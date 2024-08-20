@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 public class CalculatorUI extends JFrame{
 
     final private Font mainFont = new Font("Arial", Font.BOLD, 18);
-    final private String[] Operators = new String[]{".","+", "-", "*", "/", "(", ")", "^","√", "!"};
+    final private String[] Operators = new String[]{".","+", "-", "×", "÷", "(", ")", "^","√", "!"};
     final private String[] Numbers = new String[]{"7", "8", "9",
                                                   "4", "5", "6", 
                                                   "1", "2", "3",
@@ -56,7 +56,8 @@ public class CalculatorUI extends JFrame{
                         try {
                             outputTextField.setText(calc.Findsolution(mainString));
                         } catch (Exception ee) {
-                            outputTextField.setText("Error");
+                            outputTextField.setText("Error!: " + String.valueOf(ee));
+                            System.out.println(ee);
                         }
                         
                     }
@@ -80,8 +81,7 @@ public class CalculatorUI extends JFrame{
             String operator = Operators[i];
             operatorButtons[i] = new JButton(Operators[i]);
             operatorButtons[i].setFont(mainFont);
-            operatorButtons[i].addActionListener((ActionEvent e) -> {
-                char[] inputField = inputTextField.getText().toCharArray();
+            operatorButtons[i].addActionListener((ActionEvent e) -> {                
                 System.out.println(mainString == null);
                 if(mainString == null){
                     mainString = inputTextField.getText();
@@ -91,19 +91,16 @@ public class CalculatorUI extends JFrame{
                     }
                     
                     inputTextField.setText(mainString);
-                }          
-                
+                }                          
                 mainString = inputTextField.getText();
                 mainString += operator;
                 if("√".equals(operator)){
                     mainString+= "(";
                 }
-                inputTextField.setText(mainString);
-                           
+                inputTextField.setText(mainString);                           
             });
 
-        }     
-        
+        }             
         /* ************ Button Panel Initialize ************* */
         JPanel operatorButtonsJPanel = new JPanel();
         JPanel numberButtonsJPanel = new JPanel();
