@@ -4,57 +4,34 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-
-
 public class ScientificCalc {
-    public String InputString;
-    final private String[] Operators = new String[]{"+", "-", "*", "/", "^", "!"};
-    public Double ScientificCalc(){
+    final static private String[] Operators = new String[]{"+", "-", "*", "/", "^", "!"};
+    public Double Findsolution(String inputString){
         String[] bracketStrings;
         Double[] bracketvalues;
-        //String test = "22*3-345*3/2^4-45*5/3";
-        bracketStrings = SeperateBrackets(InputString);
-        bracketvalues = new Double[bracketStrings.length]; 
-        Print("Bracketvalues lenght: " + bracketvalues.length);    
-        return solveEquation(bracketStrings, bracketvalues);
+        bracketStrings = SeperateBrackets(inputString);
+        bracketvalues = new Double[bracketStrings.length];    
+        return SolveEquation(bracketStrings, bracketvalues);
     }
-    //(352646*567-(356-7))
+    /*
+     * General principal:
+     * 1.   Identifying the brackets and thier degree of beeing nested in the overall equation
+     * 2.0. Calculating eqach bracket and using a pointer in the higher nested equation which will then be replaced with the solution of the deeper nested equation
+     * 2.1. calculation the equation inside a bracket pair by following the general mathematical rules: Power -> Multiplication -> Addition
+     * 3.   Returning the solution of the least nested equation
+     */
     public String[] SeperateBrackets(String inputString){
         String[] Strings_to_resolve;
-        //
+        //Adding a 1 after the factorial to have a consisten structure of the array to identify the operators and the corresponding numbers
         inputString = inputString.replace("!", "!1");
+        //if there are no brackets skip the bracket-solver
         if(!inputString.contains("(")&&!inputString.contains(")")){
             Strings_to_resolve = new String[1];
             Strings_to_resolve[0] = inputString;
-            Print("skipped");            
             return Strings_to_resolve;
         }                
-        //Cleaning up the inputString:
-        //Adds a multiplication sign bewteen a number and an open bracket: e.g 45+4(3-5) -> 45+4*(3-5)
-        for(int i = 0; i<10; i++){
-            inputString = inputString.replace(i+"(", i+"*(");
-        }
-        inputString = inputString.replace(")(", ")*1*(");
-
         char[] inputChar = inputString.toCharArray();        
-        boolean root = false;
-        String rootvalue = "";
-        String rootreplacement = "";
-        for(int i = 0; i < inputChar.length; i++){
-            if("√".equals(String.valueOf(inputChar[i])))
-                root = true;    
-            if(root == true){
-                rootvalue += String.valueOf(inputChar[i]);
-                if(")".equals(String.valueOf(inputChar[i]))){
-                    rootreplacement = rootvalue.replace("√", "");
-                    inputString = inputString.replace(rootvalue, rootreplacement + "^0.5");
-                    inputString = inputString.replace("√", "");
-                    rootvalue = "";
-                    root = false;
-                }
-            }   
-        }
-        inputChar = inputString.toCharArray();
+        //checking for any obvoious mistakes by counting the open and closed brackets -> Also used to define the depth of the brackets
         int numOfBracketsOpen = 0;
         int numOfBracketsClose = 0;
         Print("InputString: "+ inputString);
@@ -65,11 +42,49 @@ public class ScientificCalc {
                 numOfBracketsClose++;    
         }
         Strings_to_resolve = new String[numOfBracketsClose+1];
+        //To do: adding a correct error message
         if(numOfBracketsClose != numOfBracketsOpen){
             return Strings_to_resolve;
         }
+        //Rewriting the square root operator to (X)^0.5 and nested square roots: e.g. √(√(36))  ->  ((36)^0.5^0.5)
+        boolean root = false;
+        String rootvalue = "";
+        String rootreplacement;
+        for(int i = 0; i < inputChar.length; i++){
+            if("√".equals(String.valueOf(inputChar[i]))){
+                root = true;   
+                rootvalue = "";
+            } 
+            if(root == true){
+                rootvalue += String.valueOf(inputChar[i]);
+                if(")".equals(String.valueOf(inputChar[i]))){
+                    rootreplacement = rootvalue.replaceFirst("√", "");
+                    inputString = inputString.replace(rootvalue, rootreplacement + "^0.5");
+                    rootvalue = "";
+                    inputChar = inputString.toCharArray();
+                    i = -1; //restarting the loop to begin at index i = 0. In case there are nested roots
+                    root = false;                    
+                }
+            }
 
-        ///(475645*454646*?0?) -> ?1?
+        }
+        
+        /*
+         * Adds a multiplication sign bewteen a number and an open bracket: e.g 45+4(3-5) -> 45+4*(3-5)
+         * Also between two brackets: e.g.  )(   ->   )*(
+         */
+        for(int i = 0; i<10; i++){
+            inputString = inputString.replace(i+"(", i+"*(");
+        }
+        inputString = inputString.replace(")(", ")*1*(");
+        /*
+         * First String in bracketString is the most nested bracket equation -> no pointers : e.g. "?0?"
+         * Initial String: (3536*(46547+356)-4)
+         * [0] 46547+356
+         * [1] (3536*?0?-4)
+         * [2] ?1?
+         * The last element in the bracketvalues is the final solution expressed as an pointer (in case there are no brackets)
+         */
         for(int j = 0; j < numOfBracketsClose; j++){
             String newstring = "";
             boolean openBracket = false;
@@ -82,37 +97,17 @@ public class ScientificCalc {
                 newstring += String.valueOf(inputChar[i]);
                 if(")".equals(String.valueOf(inputChar[i])) && openBracket == true){
                     Strings_to_resolve[j] = newstring;
-                    Print("newString " + newstring + " InputString " + inputString);
-                    int count = CountMatches(inputString, newstring);    
-                    //int count = 0;
-                    Print("InputString: " + inputString);
-                    Print("Count: " + count);
-                    if(count > 1)
-                        inputString = inputString.replaceFirst(Pattern.quote(newstring), "?"+j+"?");
-                    else
-                        inputString = inputString.replace(newstring, "?"+j+"?");
+                    inputString = inputString.replaceFirst(Pattern.quote(newstring), "?"+j+"?");
                     break;
                 }
             }
         }
         Strings_to_resolve[numOfBracketsClose] = inputString;
-        for(String string: Strings_to_resolve){
-            Print(string);
-        }
         return Strings_to_resolve;
     }
 
-    private Double solveEquation(String[] bracketString, Double[] bracketvalues){
-        //Create Numberstring
-        /*
-         * First String in bracketString is the deepest nested Bracketequation -> no values : e.g. "?0?"
-         * 
-         * [0] 46547+356
-         * [1] (3536*?0?-4)
-         * ?1?
-         */
-
-         //38425825*45258746+286-2532
+    private Double SolveEquation(String[] bracketString, Double[] bracketvalues){
+        //preparing the string for calculating by removing all brackets and adding the value of the pointer (bracketvalues), which was calculated prior
         for(int y = 0; y < bracketString.length; y++){
             String equation = bracketString[y];
             Print(equation);
@@ -136,66 +131,64 @@ public class ScientificCalc {
                 else
                     value+=String.valueOf(equationChar[i]);
             }
-            //5! -> 5!1
             numbers.add(Double.valueOf(value));
             bracketvalues[y] = Calculate(numbers, operators);
-            Print("Bracketvalue: " + bracketvalues[y]);
         }
-        Print("Solution: " + bracketvalues[bracketvalues.length-1]);
         return bracketvalues[bracketvalues.length-1];
     }
     /*
-     * 
-     * 
+     * Calculates the single bracketvalues starting from the most nested one
+     * therefore checking for powers and factorial, then multiplication and last addition
      */
     public Double Calculate(List<Double> numbers, List<String> operators){
         CalcData calcData = new CalcData();
         calcData.numbers = numbers;
         calcData.operators = operators;
 
-        calcData = RekursivePower(calcData);
-        calcData = RekursiveMultiplikation(calcData);
-        calcData = RekursiveAddition(calcData);
+        calcData = RecursivePower(calcData);
+        calcData = RecursiveMultiplication(calcData);
+        calcData = RecursiveAddition(calcData);
         return calcData.numbers.get(0);
     }
-    //3353466
-    //
-    public  CalcData RekursiveMultiplikation(CalcData calcData){
+    //going over the operators and recursivly solve all multiplication
+    public  CalcData RecursiveMultiplication(CalcData calcData){
         for(int i = 0; i < calcData.operators.size(); i++){            
             if("*".equals(calcData.operators.get(i))) {                
                 calcData.numbers.set(i, calcData.numbers.get(i) * calcData.numbers.remove(i+1));
                 calcData.operators.remove(i);
-                RekursiveMultiplikation(calcData);
+                RecursiveMultiplication(calcData);
             }
             else if("/".equals(calcData.operators.get(i))){
                 calcData.numbers.set(i, calcData.numbers.get(i) / calcData.numbers.remove(i+1));
                 calcData.operators.remove(i);
-                RekursiveMultiplikation(calcData);
+                RecursiveMultiplication(calcData);
             }
         }
         return calcData;
     }
-    public  CalcData RekursiveAddition(CalcData calcData){
+    //going over the operators and recursivly solve all addition equations
+    public  CalcData RecursiveAddition(CalcData calcData){
         for(int i = 0; i < calcData.operators.size(); i++){
             if("+".equals(calcData.operators.get(i))) {                
                 calcData.numbers.set(i, calcData.numbers.get(i) + calcData.numbers.remove(i+1));
                 calcData.operators.remove(i);
-                RekursiveAddition(calcData);
+                RecursiveAddition(calcData);
             }
             else if("-".equals(calcData.operators.get(i))){
                 calcData.numbers.set(i, calcData.numbers.get(i) - calcData.numbers.remove(i+1));
                 calcData.operators.remove(i);
-                RekursiveAddition(calcData);
+                RecursiveAddition(calcData);
             }
         }
         return calcData;
     }
-    public CalcData RekursivePower(CalcData calcData){
+    //going over the operators and recursivly solve all power and factorial equations
+    public CalcData RecursivePower(CalcData calcData){
         for(int i = 0; i<calcData.operators.size(); i++){ 
             if("^".equals(calcData.operators.get(i))){                          
                 calcData.numbers.set(i, Math.pow(calcData.numbers.get(i), calcData.numbers.remove(i+1)));
                 calcData.operators.remove(i);
-                RekursivePower(calcData);
+                RecursivePower(calcData);
             }     
             else if("!".equals(calcData.operators.get(i))){
                 double factorial = calcData.numbers.get(i);
@@ -216,15 +209,6 @@ public class ScientificCalc {
         }
         return calcData;
     }
-    public int CountMatches(String input, String countString){
-        int count = 0;
-        while(input.contains(countString)){
-            input = input.replaceFirst(Pattern.quote(countString), "");
-            Print("Input: " + input);
-            count++;
-        }
-        return count;
-    }
     public  class CalcData{
         List<Double> numbers;
         List<String> operators;
@@ -233,7 +217,7 @@ public class ScientificCalc {
     /*
      * 
      * 
-     * Just for debugging...
+     * Just for debugging... (simpler syntax)
      * 
      * 
      */
