@@ -48,24 +48,24 @@ public class CalculatorUI extends JFrame{
             numberButtons[i].setFont(mainFont);    
             int index = i;
             numberButtons[i].addActionListener((ActionEvent e) -> {
-                /* *******************Equals Button******************* */
-                if(Numbers[index].equals("=")){
-                    mainString = inputTextField.getText();
-                    mainString = mainString.replaceAll("\\s+","");
-                    inputTextField.setText(mainString);
-                    ScientificCalc calc = new ScientificCalc();
-                    outputTextField.setText(String.valueOf(calc.Findsolution(mainString))); 
-                }
-                /* ******************Clear Button********************* */
-                else if(Numbers[index].equals("AC")){
-                    mainString = null;
-                    inputTextField.setText(mainString);
-                    outputTextField.setText("");   
-                }
-                else{
-                    mainString = inputTextField.getText();
-                    mainString = mainString + value;
-                    inputTextField.setText(mainString);
+                switch (Numbers[index]) {
+                    case "=" -> { //equals button
+                        mainString = inputTextField.getText();
+                        mainString = mainString.replaceAll("\\s+","");
+                        inputTextField.setText(mainString);
+                        ScientificCalc calc = new ScientificCalc();
+                        outputTextField.setText(String.valueOf(calc.Findsolution(mainString)));
+                    }
+                    case "AC" -> { //clear button
+                        mainString = null;
+                        inputTextField.setText(mainString);
+                        outputTextField.setText("");
+                    }
+                    default -> { //default number
+                        mainString = inputTextField.getText();
+                        mainString = mainString + value;
+                        inputTextField.setText(mainString);
+                    }
                 }
 
             });
@@ -88,7 +88,7 @@ public class CalculatorUI extends JFrame{
                     
                     inputTextField.setText(mainString);
                 }          
-                else if(!Arrays.asList(Operators).contains(inputField[inputField.length-1])){
+                else if(!Arrays.asList(Operators).contains(String.valueOf(inputField[inputField.length-1]))){
                     mainString = inputTextField.getText();
                     mainString += operator;
                     if("√".equals(operator)){
